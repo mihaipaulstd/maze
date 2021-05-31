@@ -1,7 +1,13 @@
 const { Engine, Render, Runner, World, Bodies } = Matter
 
-const width = window.innerWidth
-const height = window.innerHeight
+let width = window.innerWidth
+let height = window.innerHeight
+let level = 1
+
+window.addEventListener('resize', e => {
+    width = window.innerWidth,
+    height = window.innerHeight
+})
 
 const engine = Engine.create()
 const { world } = engine
@@ -25,3 +31,23 @@ const walls = [
   Bodies.rectangle(width, height / 2, 40, height, { isStatic: true })
 ];
 World.add(world, walls)
+
+//Maze Generation
+const grid = Array(level + 1)
+    .fill(null)
+    .map(
+        () => Array(level + 1)
+            .fill(false)
+    )
+const verticals = Array(level + 1)
+    .fill(null)
+    .map(
+        () => Array(level)
+            .fill(false)
+    )
+const horizontals = Array(level)
+    .fill(null)
+    .map(
+        () => Array(level + 1)
+            .fill(false)
+    )
