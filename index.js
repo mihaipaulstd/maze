@@ -2,7 +2,7 @@ const { Engine, Render, Runner, World, Bodies } = Matter
 
 let width = window.innerWidth
 let height = window.innerHeight
-let level = 10
+let level = 20
 let cells = level + 1
 let unitLength = width / cells
 let unitHeight = height / cells
@@ -29,10 +29,10 @@ Runner.run(Runner.create(), engine)
 
 // Border walls
 const walls = [
-  Bodies.rectangle(width / 2, 0, width, 0, { isStatic: true }),
-  Bodies.rectangle(width / 2, height, width, 0, { isStatic: true }),
-  Bodies.rectangle(0, height / 2, 0, height, { isStatic: true }),
-  Bodies.rectangle(width, height / 2, 0, height, { isStatic: true })
+  Bodies.rectangle(width / 2, 0, width, 1, { isStatic: true }),
+  Bodies.rectangle(width / 2, height, width, 1, { isStatic: true }),
+  Bodies.rectangle(0, height / 2, 1, height, { isStatic: true }),
+  Bodies.rectangle(width, height / 2, 1, height, { isStatic: true })
 ];
 World.add(world, walls)
 
@@ -48,7 +48,6 @@ const shuffle = (arr) => {
         arr[counter] = arr[index]
         arr[index] = temp
     }
-
     return arr
 }
 
@@ -169,3 +168,43 @@ verticals.forEach((row, rowIndex) => {
         World.add(world, wall)
     })
 })
+
+const getRandomGridPosition = (grid => {
+    const randomRow = Math.floor(Math.random() * grid.length)
+    const randomColumn = Math.floor(Math.random() * grid[0].length)
+    return {
+        row: randomRow,
+        column: randomColumn
+    }
+})
+
+//Goal
+const goalPosition = getRandomGridPosition(grid)
+const goal = Bodies.rectangle(
+    unitLength * goalPosition.row + unitLength / 2,
+    unitHeight * goalPosition.column + unitHeight / 2,
+    (unitLength < unitHeight ? unitLength : unitHeight) * .75,
+    (unitLength < unitHeight ? unitLength : unitHeight) * .75,
+    { isStatic: true }
+)
+
+World.add(world, goal)
+
+//Ball
+let ballPosition = getRandomGridPosition(grid)
+
+do{
+    ballPosition = getRandomGridPosition(grid)
+} while(
+    ballPosition.row == goalPosition.row
+    && ballPosition.column == goalPosition.column
+)
+
+const ball = Bodies.circle(
+    unitLength * ballPosition.row + unitLength / 2,
+    unitHeight * ballPosition.column + unitHeight / 2,
+    (unitLength < unitHeight ? unitLength : unitHeight) * .75 / 2,
+    { isStatic: true }
+)
+
+World.add(world, ball)
