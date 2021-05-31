@@ -2,7 +2,11 @@ const { Engine, Render, Runner, World, Bodies } = Matter
 
 let width = window.innerWidth
 let height = window.innerHeight
-let level = 1
+let level = 10
+let cells = level + 1
+let unitLength = width / cells
+let unitHeight = height / cells
+let wallThickness = 1 //px
 
 window.addEventListener('resize', e => {
     width = window.innerWidth,
@@ -15,7 +19,7 @@ const render = Render.create({
   element: document.body,
   engine: engine,
   options: {
-    wireframes: true,
+    wireframes: false,
     width,
     height
   }
@@ -23,12 +27,12 @@ const render = Render.create({
 Render.run(render)
 Runner.run(Runner.create(), engine)
 
-// Walls
+// Border walls
 const walls = [
-  Bodies.rectangle(width / 2, 0, width, 40, { isStatic: true }),
-  Bodies.rectangle(width / 2, height, width, 40, { isStatic: true }),
-  Bodies.rectangle(0, height / 2, 40, height, { isStatic: true }),
-  Bodies.rectangle(width, height / 2, 40, height, { isStatic: true })
+  Bodies.rectangle(width / 2, 0, width, 0, { isStatic: true }),
+  Bodies.rectangle(width / 2, height, width, 0, { isStatic: true }),
+  Bodies.rectangle(0, height / 2, 0, height, { isStatic: true }),
+  Bodies.rectangle(width, height / 2, 0, height, { isStatic: true })
 ];
 World.add(world, walls)
 
@@ -48,27 +52,27 @@ const shuffle = (arr) => {
     return arr
 }
 
-const grid = Array(level + 1)
+const grid = Array(cells)
     .fill(null)
     .map(
-        () => Array(level + 1)
+        () => Array(cells)
             .fill(false)
     )
-const verticals = Array(level + 1)
+const verticals = Array(cells)
     .fill(null)
     .map(
-        () => Array(level)
+        () => Array(cells - 1)
             .fill(false)
     )
-const horizontals = Array(level)
+const horizontals = Array(cells - 1)
     .fill(null)
     .map(
-        () => Array(level + 1)
+        () => Array(cells)
             .fill(false)
     )
 
-const startingRow = Math.floor(Math.random() * (level + 1))
-const startingColumn = Math.floor(Math.random() * (level + 1))
+const startingRow = Math.floor(Math.random() * cells)
+const startingColumn = Math.floor(Math.random() * cells)
 
 
 const stepThroughGridRecursion = (row, column) => {
@@ -94,9 +98,9 @@ const stepThroughGridRecursion = (row, column) => {
         //Check if neighbor is out of bounds
         if(
             nextRow < 0
-            || nextRow >= level + 1
+            || nextRow >= cells
             || nextColumn < 0
-            || nextColumn >= level + 1
+            || nextColumn >= cells
         ) {
             continue
         }
@@ -130,3 +134,38 @@ const stepThroughGridRecursion = (row, column) => {
 
 stepThroughGridRecursion(startingRow, startingColumn)
 
+horizontals.forEach((row, rowIndex) => {
+    row.forEach((open, columnIndex) => {
+        if(open) {
+            return
+        }
+
+        const wall = Bodies.rectangle(
+            columnIndex * unitLength + unitLength / 2,
+            (rowIndex + 1) * unitHeight,
+            unitLength,
+            wallThickness,
+            { isStatic: true }
+        )
+
+        World.add(world, wall)
+    })
+})
+
+verticals.forEach((row, rowIndex) => {
+    row.forEach((open, columnIndex) => {
+        if(open) {
+            return
+        }
+
+        const wall = Bodies.rectangle(
+            (columnIndex + 1) * unitLength,
+            rowIndex * unitHeight + unitHeight / 2,
+            wallThickness,
+            unitHeight,
+            { isStatic: true }
+        )
+
+        World.add(world, wall)
+    })
+})
