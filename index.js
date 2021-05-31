@@ -1,4 +1,4 @@
-const { Engine, Render, Runner, World, Bodies, Body } = Matter
+const { Engine, Render, Runner, World, Bodies, Body, Events } = Matter
 
 let width = window.innerWidth
 let height = window.innerHeight
@@ -186,7 +186,7 @@ const goal = Bodies.rectangle(
     unitHeight * goalPosition.column + unitHeight / 2,
     (unitLength < unitHeight ? unitLength : unitHeight) * .75,
     (unitLength < unitHeight ? unitLength : unitHeight) * .75,
-    { isStatic: true }
+    { isStatic: true, label: 'goal' }
 )
 
 World.add(world, goal)
@@ -205,7 +205,7 @@ const ball = Bodies.circle(
     unitLength * ballPosition.row + unitLength / 2,
     unitHeight * ballPosition.column + unitHeight / 2,
     (unitLength < unitHeight ? unitLength : unitHeight) * .75 / 2,
-    { isStatic: false }
+    { isStatic: false, label: 'ball' }
 )
 
 World.add(world, ball)
@@ -227,4 +227,15 @@ document.addEventListener('keydown', e => {
             break
                                 
     }
+})
+
+//Win condition
+Events.on(engine, 'collisionStart', e => {
+    e.pairs.forEach(collision => {
+        const labels = ['ball', 'goal']
+
+        if (labels.includes(collision.bodyA.label) && labels.includes(collision.bodyB.label)) {
+            console.log('Win')
+        }
+    })
 })
