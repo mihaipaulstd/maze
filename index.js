@@ -1,8 +1,8 @@
-const { Engine, Render, Runner, World, Bodies } = Matter
+const { Engine, Render, Runner, World, Bodies, Body } = Matter
 
 let width = window.innerWidth
 let height = window.innerHeight
-let level = 20
+let level = 3
 let cells = level + 1
 let unitLength = width / cells
 let unitHeight = height / cells
@@ -14,6 +14,7 @@ window.addEventListener('resize', e => {
 })
 
 const engine = Engine.create()
+engine.world.gravity.y = 0
 const { world } = engine
 const render = Render.create({
   element: document.body,
@@ -204,7 +205,26 @@ const ball = Bodies.circle(
     unitLength * ballPosition.row + unitLength / 2,
     unitHeight * ballPosition.column + unitHeight / 2,
     (unitLength < unitHeight ? unitLength : unitHeight) * .75 / 2,
-    { isStatic: true }
+    { isStatic: false }
 )
 
 World.add(world, ball)
+
+document.addEventListener('keydown', e => {
+    const {x, y} = ball.velocity
+    switch(e.key) {
+        case 'w':
+            Body.setVelocity(ball, { x, y: y - 5 })
+            break
+        case 'd':
+            Body.setVelocity(ball, { x: x + 5, y })
+            break
+        case 's':
+            Body.setVelocity(ball, { x, y: y + 5 })
+            break
+        case 'a':
+            Body.setVelocity(ball, { x: x - 5, y })
+            break
+                                
+    }
+})
