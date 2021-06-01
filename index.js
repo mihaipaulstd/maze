@@ -1,17 +1,12 @@
-const { Engine, Render, Runner, World, Bodies, Body, Events } = Matter
+const { Engine, Render, Runner, World, Bodies, Body, Events, Mouse, MouseConstraint } = Matter
 
-let width = window.innerWidth
-let height = window.innerHeight
-let level = 3
+const width = window.innerWidth
+const height = window.innerHeight
+let level = 10
 let cells = level + 1
 let unitLength = width / cells
 let unitHeight = height / cells
-let wallThickness = 1 //px
-
-window.addEventListener('resize', e => {
-    width = window.innerWidth,
-    height = window.innerHeight
-})
+const wallThickness = 1 //px
 
 const engine = Engine.create()
 engine.world.gravity.y = 0
@@ -28,6 +23,7 @@ const render = Render.create({
 Render.run(render)
 Runner.run(Runner.create(), engine)
 
+
 // Border walls
 const walls = [
   Bodies.rectangle(width / 2, 0, width, 1, { isStatic: true }),
@@ -36,6 +32,18 @@ const walls = [
   Bodies.rectangle(width, height / 2, 1, height, { isStatic: true })
 ];
 World.add(world, walls)
+
+const wallRenderOptions = {
+    fillStyle: 'white'
+}
+
+const ballRenderOptions = {
+    fillStyle: 'yellow'
+}
+
+const goalRenderOptions = {
+    fillStyle: 'green'
+}
 
 //Maze Generation
 const shuffle = (arr) => {
@@ -71,6 +79,7 @@ const horizontals = Array(cells - 1)
             .fill(false)
     )
 
+
 const startingRow = Math.floor(Math.random() * cells)
 const startingColumn = Math.floor(Math.random() * cells)
 
@@ -85,9 +94,9 @@ const stepThroughGridRecursion = (row, column) => {
 
     //Assemble randomly-ordered list of neighbors
     const neighbors = shuffle([
-        [row - 1, column, 'up'],       //top
+        [row - 1, column, 'up'],        //top
         [row, column + 1, 'right'],     //right
-        [row + 1, column, 'down'],    //bottom
+        [row + 1, column, 'down'],      //bottom
         [row, column - 1, 'left']       //left
     ])
 
@@ -145,7 +154,7 @@ horizontals.forEach((row, rowIndex) => {
             (rowIndex + 1) * unitHeight,
             unitLength,
             wallThickness,
-            { isStatic: true }
+            { isStatic: true, render: wallRenderOptions }
         )
 
         World.add(world, wall)
@@ -163,7 +172,8 @@ verticals.forEach((row, rowIndex) => {
             rowIndex * unitHeight + unitHeight / 2,
             wallThickness,
             unitHeight,
-            { isStatic: true }
+            { isStatic: true, render: wallRenderOptions },
+            
         )
 
         World.add(world, wall)
@@ -186,7 +196,7 @@ const goal = Bodies.rectangle(
     unitHeight * goalPosition.column + unitHeight / 2,
     (unitLength < unitHeight ? unitLength : unitHeight) * .75,
     (unitLength < unitHeight ? unitLength : unitHeight) * .75,
-    { isStatic: true, label: 'goal' }
+    { isStatic: false, label: 'goal', render: goalRenderOptions }
 )
 
 World.add(world, goal)
@@ -205,29 +215,44 @@ const ball = Bodies.circle(
     unitLength * ballPosition.row + unitLength / 2,
     unitHeight * ballPosition.column + unitHeight / 2,
     (unitLength < unitHeight ? unitLength : unitHeight) * .75 / 2,
-    { isStatic: false, label: 'ball' }
+    { isStatic: false, label: 'ball', render: ballRenderOptions }
 )
 
 World.add(world, ball)
 
-document.addEventListener('keydown', e => {
-    const {x, y} = ball.velocity
-    switch(e.key) {
-        case 'w':
-            Body.setVelocity(ball, { x, y: y - 5 })
-            break
-        case 'd':
-            Body.setVelocity(ball, { x: x + 5, y })
-            break
-        case 's':
-            Body.setVelocity(ball, { x, y: y + 5 })
-            break
-        case 'a':
-            Body.setVelocity(ball, { x: x - 5, y })
-            break
-                                
-    }
+
+
+const canvas = document.querySelector('canvas')
+
+canvas.onclick = function() {
+    canvas.requestPointerLock();
+  }
+
+document.addEventListener('pointerlockchange', e => {
+    console.log('yay')
 })
+
+
+World.add(world, MouseConstraint.create(engine, {
+    mouse: Mouse.create(render.canvas)
+}))
+
+
+const lastMousePosition = {}
+
+
+
+const callback = e => {
+    const dx = e.movementX
+    const dy = e.movementY
+
+    Body.translate(ball, { x: dx, y: dy })
+    lastMousePosition['x'] = e.movementX
+    lastMousePosition['y'] = e.movementY
+
+}
+
+window.addEventListener("mousemove", callback)
 
 //Win condition
 Events.on(engine, 'collisionStart', e => {
