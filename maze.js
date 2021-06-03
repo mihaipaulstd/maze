@@ -1,6 +1,5 @@
 const { initGrid } = require('./init.js')
 const { generateMazePath, getRandomGridPosition } = require('./utils.js')
-const addBodiesTo = require('./bodyBuilder.js')
 const buildWalls = require('./wallBuilder.js')
 const paintWalls = require('./wallPainter.js')
 const eraseWalls = require('./wallEraser.js')
@@ -56,8 +55,6 @@ class Maze {
         eraseWalls(this, world)
         eraseBodies(this, world)
     }
-
-    addBodies = world => addBodiesTo(this, world)
 
     getDimension = () => this.dimension
     getWidth = () => this.width

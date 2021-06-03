@@ -203,7 +203,6 @@ module.exports = {
 },{"./node_modules/matter-js/build/matter.js":9,"./state.js":10}],7:[function(require,module,exports){
 const { initGrid } = require('./init.js')
 const { generateMazePath, getRandomGridPosition } = require('./utils.js')
-const addBodiesTo = require('./bodyBuilder.js')
 const buildWalls = require('./wallBuilder.js')
 const paintWalls = require('./wallPainter.js')
 const eraseWalls = require('./wallEraser.js')
@@ -260,8 +259,6 @@ class Maze {
         eraseBodies(this, world)
     }
 
-    addBodies = world => addBodiesTo(this, world)
-
     getDimension = () => this.dimension
     getWidth = () => this.width
     getHeight = () => this.height
@@ -286,7 +283,7 @@ class Maze {
 }
 
 module.exports = Maze
-},{"./bodyBuilder":1,"./bodyBuilder.js":1,"./bodyEraser":2,"./bodyPainter":3,"./init.js":6,"./utils.js":11,"./wallBuilder.js":12,"./wallEraser.js":13,"./wallPainter.js":14}],8:[function(require,module,exports){
+},{"./bodyBuilder":1,"./bodyEraser":2,"./bodyPainter":3,"./init.js":6,"./utils.js":11,"./wallBuilder.js":12,"./wallEraser.js":13,"./wallPainter.js":14}],8:[function(require,module,exports){
 const { Body, Composite, Mouse, MouseConstraint } = require('./node_modules/matter-js/build/matter.js')
 const mouseHandler = (world, render, engine, ball) => {
 
