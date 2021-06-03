@@ -1,0 +1,23 @@
+{
+  "name": "maze",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mihaipaulstd/maze.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mihaipaulstd/maze/issues"
+  },
+  "homepage": "https://github.com/mihaipaulstd/maze#readme",
+  "dependencies": {
+    "browserify": "^17.0.0",
+    "matter-js": "^0.17.1"
+  }
+}
