@@ -46,6 +46,8 @@ startButton.onclick = e => {
             world.bodies.forEach(body => {
                 if(body.label === 'wall') {
                     Body.setStatic(body, false)
+                } else if(body.label === 'ball' || body.label === 'goal') {
+                    body.label = 'void'
                 }
             })
         } else {

@@ -136,6 +136,8 @@ startButton.onclick = e => {
             world.bodies.forEach(body => {
                 if(body.label === 'wall') {
                     Body.setStatic(body, false)
+                } else if(body.label === 'ball' || body.label === 'goal') {
+                    body.label = 'void'
                 }
             })
         } else {
@@ -309,10 +311,11 @@ module.exports = Maze
 const { Body, Composite, Mouse, MouseConstraint } = require('./node_modules/matter-js/build/matter.js')
 const mouseHandler = (world, render, engine, ball) => {
 
-    
-    Composite.add(world, MouseConstraint.create(engine, {
+    const mouseconstraint = MouseConstraint.create(engine, {
         mouse: Mouse.create(render.canvas)
-    }))
+    })
+
+    ball ? Composite.add(world, mouseconstraint) : Composite.remove(world, mouseconstraint)
 
     mousemoveListener = e => {
         const dx = e.movementX
@@ -322,6 +325,7 @@ const mouseHandler = (world, render, engine, ball) => {
     }
     
     window.onmousemove = ball ? mousemoveListener : null
+
 
 
 
