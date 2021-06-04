@@ -6,4 +6,27 @@
 
 body {
     overflow: hidden;
+    background: #14151f;
+}
+
+#start-button,
+#game-over {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    border: 1px solid #fff;
+    padding: 20px 200px;
+    background: transparent;
+    font-size: 50px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#game-over {
+    border: none
+}
+
+.hidden {
+    opacity: 0;
 }

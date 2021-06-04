@@ -15,7 +15,6 @@ const initEngine = () => {
         }
     });
     
-    engine.world.gravity.x = 0
     engine.world.gravity.y = 0
     
     Render.run(render)

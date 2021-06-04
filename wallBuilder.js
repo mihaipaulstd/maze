@@ -35,7 +35,7 @@ const wallBuilder = (maze, world) => {
                     (rowIndex + 1) * unitHeight,
                     unitLength,
                     wallThickness,
-                    { isStatic: true, render: renderOptions }
+                    { isStatic: true, render: renderOptions, label: "wall" }
                 )
             )
     
@@ -55,7 +55,7 @@ const wallBuilder = (maze, world) => {
                     rowIndex * unitHeight + unitHeight / 2,
                     wallThickness,
                     unitHeight,
-                    { isStatic: true, render: renderOptions },
+                    { isStatic: true, render: renderOptions, label: "wall" },
                 )
             )
         })

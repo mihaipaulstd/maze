@@ -13,7 +13,12 @@ const mouseHandler = (world, render, engine, ball) => {
         Body.translate(ball, { x: dx, y: dy })
     }
     
-    window.addEventListener("mousemove", mousemoveListener)
+    window.onmousemove = ball ? mousemoveListener : null
+
+
+
+
+    
 }
 
 module.exports = mouseHandler

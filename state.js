@@ -1,4 +1,4 @@
-module.exports = class State {
+class State {
     constructor() {
         this.gameOver = true
         this.level = 1
@@ -10,3 +10,6 @@ module.exports = class State {
     setLevel = level => this.level = level
     setGameOver = (gameOver) => this.gameOver = gameOver
 }
+
+
+module.exports = State

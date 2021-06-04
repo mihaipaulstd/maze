@@ -1,3 +1,7 @@
+const addClass = (element = null, className = "") => element.classList.add(className)
+
+const removeClass = (element = null, className = "") => element.classList.remove(className)
+
 const getRandomGridPosition = (maze) => {
     const randomRow = Math.floor(Math.random() * maze.getDimension())
     const randomColumn = Math.floor(Math.random() * maze.getDimension())
@@ -87,5 +91,7 @@ const generateMazePath = (row, column, maze) => {
 module.exports = {
     generateMazePath,
     shuffle,
-    getRandomGridPosition
+    getRandomGridPosition,
+    addClass,
+    removeClass
 }

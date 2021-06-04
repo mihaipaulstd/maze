@@ -10,8 +10,8 @@ const bodyBuilder = (maze) => {
     const goal = Bodies.rectangle(
         unitLength * goalPosition.row + unitLength / 2,
         unitHeight * goalPosition.column + unitHeight / 2,
-        (unitLength < unitHeight ? unitLength : unitHeight) * .75,
-        (unitLength < unitHeight ? unitLength : unitHeight) * .75,
+        (unitLength < unitHeight ? unitLength : unitHeight) * .4,
+        (unitLength < unitHeight ? unitLength : unitHeight) * .4,
         { isStatic: false, label: 'goal', render: { fillStyle: "green" } }
     )
 
@@ -30,8 +30,8 @@ const bodyBuilder = (maze) => {
     const ball = Bodies.circle(
         unitLength * ballPosition.row + unitLength / 2,
         unitHeight * ballPosition.column + unitHeight / 2,
-        (unitLength < unitHeight ? unitLength : unitHeight) * .75 / 2,
-        { isStatic: false, label: 'ball', render: { fillStyle: "yellow" }, stiffness: 0, damping: 0 }
+        (unitLength < unitHeight ? unitLength : unitHeight) * .4 / 2,
+        { isStatic: false, label: 'ball', render: { fillStyle: "yellow" }, mass: 10 }
     )
 
     return { ball, goal }
@@ -69,72 +69,95 @@ module.exports = bodyPainter
 },{"matter-js":9}],4:[function(require,module,exports){
 const { Events } = require('./node_modules/matter-js/build/matter.js')
 
-const onLevelUp = (engine, callback) => Events.on(engine, 'collisionStart', e => {
+const onCollision = (engine, callback) => Events.on(engine, 'collisionStart', e => {
     e.pairs.forEach(collision => {
-        const labels = ['ball', 'goal']
-        if (labels.includes(collision.bodyA.label) && labels.includes(collision.bodyB.label)) {
-            callback()
+        const win = ['ball', 'goal']
+        const lose = ['ball', 'wall']
+        if (win.includes(collision.bodyA.label) && win.includes(collision.bodyB.label)) {
+            callback(false)
+        }
+        if (lose.includes(collision.bodyA.label) && lose.includes(collision.bodyB.label)) {
+            callback(true)
         }
     })
 })
 
-module.exports = onLevelUp
+
+
+module.exports = onCollision
 
 
 },{"./node_modules/matter-js/build/matter.js":9}],5:[function(require,module,exports){
 // import { Engine, Render, Runner, World, Bodies, Body, Events, Mouse, MouseConstraint } from './node_modules/matter-js/build/matter'
+
+
 const startButton = document.getElementById('start-button')
+const gameOverMessage = document.getElementById('game-over')
 
 const mouseHandler = require('./mouseHandler.js')
 const { initEngine, initState } = require('./init.js')
-const onLevelUp = require('./collision.js')
+const onCollision = require('./collision.js')
 const Maze = require('./maze.js')
+const { Body } = require('matter-js')
+const { addClass, removeClass } = require('./utils.js')
 
 
     
 startButton.onclick = e => {
-
     const { engine, world, render, canvas } = initEngine()
     const state = initState()
-    
 
-    state.setGameOver(false)
+    addClass(startButton, 'hidden')
 
-    state.setLevel(1)
-
-    canvas.requestPointerLock()
-
-    
-
-    
     let maze = new Maze(state.getLevel() + 1, {
-        fillStyle: "#fff"
-    })
+            fillStyle: "#fff"
+        })
     
+    state.setGameOver(false)
     
+    state.setLevel(1)
+    
+    canvas.requestPointerLock()
     
     
     maze.set(world)
     
+    
     mouseHandler(world, render, engine, maze.getBodies().ball)
 
-    onLevelUp(engine, () => {        
-        maze.erase(world)
+    onCollision(engine, gameOver => {
+        if(gameOver) {
+            state.setGameOver(true)
+
+            removeClass(gameOverMessage, 'hidden')
+            document.exitPointerLock()
+            mouseHandler(world, render, engine, null)
+            world.gravity.y = .5
+            world.bodies.forEach(body => {
+                if(body.label === 'wall') {
+                    Body.setStatic(body, false)
+                }
+            })
+        } else {
+            maze.erase(world)
         
         
-        state.setLevel(state.getLevel() + 1)
+            state.setLevel(state.getLevel() + 1)
+    
+            maze = new Maze(state.getLevel() + 1, {
+                fillStyle: "#fff"
+            })
+    
+            maze.set(world)
+    
+            mouseHandler(world, render, engine, maze.getBodies().ball)
+        }
 
-        maze = new Maze(state.getLevel() + 1, {
-            fillStyle: "#fff"
-        })
-
-        maze.set(world)
-
-        mouseHandler(world, render, engine, maze.getBodies().ball)
+        
     })
 }
 
-},{"./collision.js":4,"./init.js":6,"./maze.js":7,"./mouseHandler.js":8}],6:[function(require,module,exports){
+},{"./collision.js":4,"./init.js":6,"./maze.js":7,"./mouseHandler.js":8,"./utils.js":11,"matter-js":9}],6:[function(require,module,exports){
 const { Engine, Render, Runner } = require('./node_modules/matter-js/build/matter.js')
 const State = require('./state.js')
 
@@ -152,7 +175,6 @@ const initEngine = () => {
         }
     });
     
-    engine.world.gravity.x = 0
     engine.world.gravity.y = 0
     
     Render.run(render)
@@ -220,7 +242,7 @@ class Maze {
         this.unitHeight = this.height / this.dimension
         this.walls = []
         this.bodies = []
-        this.wallThickness = 1
+        this.wallThickness = 3
         this.renderOptions = renderOptions
     }
 
@@ -299,7 +321,12 @@ const mouseHandler = (world, render, engine, ball) => {
         Body.translate(ball, { x: dx, y: dy })
     }
     
-    window.addEventListener("mousemove", mousemoveListener)
+    window.onmousemove = ball ? mousemoveListener : null
+
+
+
+
+    
 }
 
 module.exports = mouseHandler
@@ -10762,7 +10789,7 @@ var Common = __webpack_require__(0);
 });
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],10:[function(require,module,exports){
-module.exports = class State {
+class State {
     constructor() {
         this.gameOver = true
         this.level = 1
@@ -10774,7 +10801,14 @@ module.exports = class State {
     setLevel = level => this.level = level
     setGameOver = (gameOver) => this.gameOver = gameOver
 }
+
+
+module.exports = State
 },{}],11:[function(require,module,exports){
+const addClass = (element = null, className = "") => element.classList.add(className)
+
+const removeClass = (element = null, className = "") => element.classList.remove(className)
+
 const getRandomGridPosition = (maze) => {
     const randomRow = Math.floor(Math.random() * maze.getDimension())
     const randomColumn = Math.floor(Math.random() * maze.getDimension())
@@ -10864,7 +10898,9 @@ const generateMazePath = (row, column, maze) => {
 module.exports = {
     generateMazePath,
     shuffle,
-    getRandomGridPosition
+    getRandomGridPosition,
+    addClass,
+    removeClass
 }
 },{}],12:[function(require,module,exports){
 const { Bodies } = require('matter-js')
@@ -10904,7 +10940,7 @@ const wallBuilder = (maze, world) => {
                     (rowIndex + 1) * unitHeight,
                     unitLength,
                     wallThickness,
-                    { isStatic: true, render: renderOptions }
+                    { isStatic: true, render: renderOptions, label: "wall" }
                 )
             )
     
@@ -10924,7 +10960,7 @@ const wallBuilder = (maze, world) => {
                     rowIndex * unitHeight + unitHeight / 2,
                     wallThickness,
                     unitHeight,
-                    { isStatic: true, render: renderOptions },
+                    { isStatic: true, render: renderOptions, label: "wall" },
                 )
             )
         })

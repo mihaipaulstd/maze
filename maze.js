@@ -17,7 +17,7 @@ class Maze {
         this.unitHeight = this.height / this.dimension
         this.walls = []
         this.bodies = []
-        this.wallThickness = 1
+        this.wallThickness = 3
         this.renderOptions = renderOptions
     }
 
