@@ -132,7 +132,7 @@ startButton.onclick = e => {
             removeClass(gameOverMessage, 'hidden')
             document.exitPointerLock()
             mouseHandler(world, render, engine, null)
-            world.gravity.y = .5
+            world.gravity.y = .4
             world.bodies.forEach(body => {
                 if(body.label === 'wall') {
                     Body.setStatic(body, false)
