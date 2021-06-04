@@ -9,6 +9,17 @@ body {
     background: #14151f;
 }
 
+
+#logo {
+    position: absolute;
+    top: 5%;
+    left: 15%;
+    color: #fff;
+    font-size: 30px;
+    font-family: Josefin Sans;
+    font-weight: bold;
+}
+
 #start-button,
 #game-over {
     position: absolute;

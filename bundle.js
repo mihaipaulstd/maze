@@ -93,6 +93,8 @@ module.exports = onCollision
 
 const startButton = document.getElementById('start-button')
 const gameOverMessage = document.getElementById('game-over')
+const logo = document.getElementById('logo')
+
 
 const mouseHandler = require('./mouseHandler.js')
 const { initEngine, initState } = require('./init.js')
@@ -108,6 +110,7 @@ startButton.onclick = e => {
     const state = initState()
 
     addClass(startButton, 'hidden')
+    addClass(logo, 'hidden')
 
     let maze = new Maze(state.getLevel() + 1, {
             fillStyle: "#fff"
@@ -128,7 +131,6 @@ startButton.onclick = e => {
     onCollision(engine, gameOver => {
         if(gameOver) {
             state.setGameOver(true)
-
             removeClass(gameOverMessage, 'hidden')
             document.exitPointerLock()
             mouseHandler(world, render, engine, null)
@@ -141,6 +143,7 @@ startButton.onclick = e => {
                 }
             })
         } else {
+
             maze.erase(world)
         
         
